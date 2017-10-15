@@ -1,4 +1,3 @@
-
 module.exports = function(grunt) {
   var cfg = require('require-grunt-configs')(grunt, 'grunt/conf');
   grunt.initConfig(cfg);
@@ -8,8 +7,8 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['build']);
   grunt.registerTask('build', [
     'clean',
-    'jshint',
+    // 'jshint',
     'browserify',
-    'uglify'
+    'uglify',
   ]);
 };

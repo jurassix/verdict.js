@@ -4,6 +4,7 @@
   "description": "Verdict rule composition with nesting",
   "main": "lib/index.js",
   "scripts": {
+    "build": "grunt build",
     "test": "mocha --require should --timeout=5000 test/**/*.test.js"
   },
   "repository": {
@@ -25,7 +26,6 @@
   },
   "homepage": "https://github.com/rfink/verdict.js",
   "devDependencies": {
-    "grunt": "0.4.5",
     "grunt-browserify": "3.0.1",
     "grunt-contrib-clean": "0.6.0",
     "grunt-contrib-jshint": "0.10.0",
@@ -36,6 +36,8 @@
     "should": "4.0.4"
   },
   "dependencies": {
+    "grunt": "^1.0.1",
+    "lodash": "^4.17.4",
     "selectn": "0.9.6",
     "version-compare.js": "0.0.0",
     "weighted": "0.2.2"
