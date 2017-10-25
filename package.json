@@ -11,14 +11,7 @@
     "type": "git",
     "url": "https://github.com/rfink/verdict.js"
   },
-  "keywords": [
-    "rule",
-    "rules",
-    "engine",
-    "builder",
-    "boolean",
-    "condition"
-  ],
+  "keywords": ["rule", "rules", "engine", "builder", "boolean", "condition"],
   "author": "Ryan Fink <ryanjfink@gmail.com>",
   "license": "MIT",
   "bugs": {
@@ -38,7 +31,7 @@
   "dependencies": {
     "grunt": "^1.0.1",
     "lodash": "^4.17.4",
-    "selectn": "0.9.6",
+    "selectn": "1.1.2",
     "version-compare.js": "0.0.0",
     "weighted": "0.2.2"
   }
