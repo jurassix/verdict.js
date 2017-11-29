@@ -179,6 +179,15 @@ describe('Comparison test', function() {
         .compile({ nextValue: null, ruleValue: '1 == 2' })
         .should.equal(false);
     });
+    it('should compare compile and expose value and previous value', function() {
+      comparators
+        .compile({
+          nextValue: 'yolo',
+          previousValue: 'nolo',
+          ruleValue: 'value === "yolo" && previousValue === "nolo"',
+        })
+        .should.equal(true);
+    });
   });
 
   describe('RegEx/Negative RegEx', function() {

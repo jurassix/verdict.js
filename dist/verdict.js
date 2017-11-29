@@ -253,6 +253,8 @@ exports.lteVersion = function lteVersion(props) {
  * Compile manual javascript with variable replacement ( {var.name} )
  */
 exports.compile = function compile(props) {
+  var nextValue = props.nextValue;
+  var previousValue = props.previousValue;
   var ruleValue = props.ruleValue;
   var compiler = null;
   var cfg = ruleValue
@@ -261,9 +263,9 @@ exports.compile = function compile(props) {
     .replace(/^(return)/i, '')
     .replace(/(;)$/, '');
   /*jshint evil:true */
-  compiler = new Function('return !!(' + cfg + ');');
+  compiler = new Function('value', 'previousValue', 'return !!(' + cfg + ');');
 
-  return compiler();
+  return compiler(nextValue, previousValue);
 };
 
 },{"lodash/isEqual":91,"version-compare.js":103,"weighted":104}],2:[function(require,module,exports){
