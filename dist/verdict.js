@@ -253,9 +253,16 @@ exports.lteVersion = function lteVersion(props) {
  * Compile manual javascript with variable replacement ( {var.name} )
  */
 exports.compile = function compile(props) {
+  // response scoped to rule path
   var nextValue = props.nextValue;
   var previousValue = props.previousValue;
   var ruleValue = props.ruleValue;
+
+  // all responses
+  var context = prop.context || {};
+  var previousResponses = context.previousValue || {};
+  var nextResponses = context.nextValue || {};
+
   var compiler = null;
   var cfg = ruleValue
     .replace(/^([\s]+)/, '')
@@ -263,9 +270,15 @@ exports.compile = function compile(props) {
     .replace(/^(return)/i, '')
     .replace(/(;)$/, '');
   /*jshint evil:true */
-  compiler = new Function('value', 'previousValue', 'return !!(' + cfg + ');');
+  compiler = new Function(
+    'value',
+    'previousValue',
+    'answers',
+    'previousAnswers',
+    'return !!(' + cfg + ');'
+  );
 
-  return compiler(nextValue, previousValue);
+  return compiler(nextValue, previousValue, nextResponses, previousResponses);
 };
 
 },{"lodash/isEqual":91,"version-compare.js":103,"weighted":104}],2:[function(require,module,exports){
@@ -458,11 +471,15 @@ function Rule(rule) {
 }
 
 /**
- * Test our rule with the given context.
- *   If a second argument is supplied and is a callback,
- *   we will pass the results to that async-style
+  Usage: 
+    const ruleSet = verdict().parse(ruleCriteria);
+    const result = ruleSet.test({
+      previousValue: formResponses || {}, // current answers
+      nextValue: nextFormResponses,       // next answers
+      init: init === true,                // initializaiton flag - fire onInit only when true
+      fields,                             // formDesignFields - field.id === this.path
+    });
  */
-// TODO don't support legacy api, nextValue is too common, but symbolic key is too verbose
 Rule.prototype.test = function test(context) {
   var nextValue = selectn(this.path, context) || '';
   var previousValue = '';
@@ -486,6 +503,7 @@ Rule.prototype.test = function test(context) {
 
   return !!(
     comparator.call(null, {
+      context: context,
       init: init,
       nextValue: nextValue,
       previousValue: previousValue,
@@ -2508,10 +2526,13 @@ var reIsUint = /^(?:0|[1-9]\d*)$/;
  * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
  */
 function isIndex(value, length) {
+  var type = typeof value;
   length = length == null ? MAX_SAFE_INTEGER : length;
+
   return !!length &&
-    (typeof value == 'number' || reIsUint.test(value)) &&
-    (value > -1 && value % 1 == 0 && value < length);
+    (type == 'number' ||
+      (type != 'symbol' && reIsUint.test(value))) &&
+        (value > -1 && value % 1 == 0 && value < length);
 }
 
 module.exports = isIndex;
@@ -2851,6 +2872,14 @@ var freeProcess = moduleExports && freeGlobal.process;
 /** Used to access faster Node.js helpers. */
 var nodeUtil = (function() {
   try {
+    // Use `util.types` for Node.js 10+.
+    var types = freeModule && freeModule.require && freeModule.require('util').types;
+
+    if (types) {
+      return types;
+    }
+
+    // Legacy `process.binding('util')` for Node.js < 10.
     return freeProcess && freeProcess.binding && freeProcess.binding('util');
   } catch (e) {}
 }());
