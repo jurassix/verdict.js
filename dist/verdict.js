@@ -259,7 +259,7 @@ exports.compile = function compile(props) {
   var ruleValue = props.ruleValue;
 
   // all responses
-  var context = prop.context || {};
+  var context = props.context || {};
   var previousResponses = context.previousValue || {};
   var nextResponses = context.nextValue || {};
 
