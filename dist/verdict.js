@@ -260,8 +260,9 @@ exports.compile = function compile(props) {
 
   // all responses
   var context = props.context || {};
-  var previousResponses = context.previousValue || {};
   var nextResponses = context.nextValue || {};
+  var parentAnswers = context.parentAnswers || {};
+  var previousResponses = context.previousValue || {};
 
   var compiler = null;
   var cfg = ruleValue
@@ -275,10 +276,17 @@ exports.compile = function compile(props) {
     'previousValue',
     'answers',
     'previousAnswers',
+    'parentAnswers',
     'return !!(' + cfg + ');'
   );
 
-  return compiler(nextValue, previousValue, nextResponses, previousResponses);
+  return compiler(
+    nextValue,
+    previousValue,
+    nextResponses,
+    previousResponses,
+    parentAnswers
+  );
 };
 
 },{"lodash/isEqual":91,"version-compare.js":103,"weighted":104}],2:[function(require,module,exports){
@@ -474,6 +482,7 @@ function Rule(rule) {
   Usage: 
     const ruleSet = verdict().parse(ruleCriteria);
     const result = ruleSet.test({
+      parentAnswers: parentFormResponses, // parent answers iff sub-form
       previousValue: formResponses || {}, // current answers
       nextValue: nextFormResponses,       // next answers
       init: init === true,                // initializaiton flag - fire onInit only when true
@@ -481,9 +490,9 @@ function Rule(rule) {
     });
  */
 Rule.prototype.test = function test(context) {
+  var init = context['init'] === true;
   var nextValue = selectn(this.path, context) || '';
   var previousValue = '';
-  var init = context['init'] === true;
 
   if (context.hasOwnProperty('nextValue')) {
     nextValue =
