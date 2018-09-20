@@ -248,6 +248,11 @@ exports.lteVersion = function lteVersion(props) {
   return cmp === 0 || cmp === 1;
 };
 
+function wrapExpression(expression) {
+  var hasReturn = expression.indexOf('return') !== -1;
+  return (hasReturn ? '' : 'return') + ' ' + expression;
+}
+
 // TODO: the signature here is b
 /**
  * Compile manual javascript with variable replacement ( {var.name} )
@@ -256,7 +261,7 @@ exports.compile = function compile(props) {
   // response scoped to rule path
   var nextValue = props.nextValue;
   var previousValue = props.previousValue;
-  var ruleValue = props.ruleValue;
+  var expression = props.ruleValue;
 
   // all responses
   var context = props.context || {};
@@ -264,29 +269,24 @@ exports.compile = function compile(props) {
   var parentAnswers = context.parentAnswers || {};
   var previousResponses = context.previousValue || {};
 
-  var compiler = null;
-  var cfg = ruleValue
-    .replace(/^([\s]+)/, '')
-    .replace(/([\s]+)$/, '')
-    .replace(/^(return)/i, '')
-    .replace(/(;)$/, '');
   /*jshint evil:true */
-  compiler = new Function(
+  var expressionFn = new Function(
     'value',
     'previousValue',
     'answers',
     'previousAnswers',
     'parentAnswers',
-    'return !!(' + cfg + ');'
+    wrapExpression(expression)
   );
 
-  return compiler(
+  var answer = expressionFn(
     nextValue,
     previousValue,
     nextResponses,
     previousResponses,
     parentAnswers
   );
+  return answer === true;
 };
 
 },{"lodash/isEqual":91,"version-compare.js":103,"weighted":104}],2:[function(require,module,exports){
